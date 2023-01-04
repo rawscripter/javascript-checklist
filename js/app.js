@@ -1,16 +1,16 @@
 const milestonesData = JSON.parse(data).data
 
-// load course milestone data 
 
-function loadMilestones() {
-    const milestones = document.querySelector('.milestones')
+// load course milestone data
 
-    milestones.innerHTML = `${milestonesData
+function loadMilestones(mileStoneList,outputDiv) {
+    const milestones = document.querySelector(outputDiv)
+    milestones.innerHTML = `${mileStoneList
         .map(function(milestone) {
             return `<div class="milestone border-b" id = '${milestone._id}'>
                     <div class="flex">
                         <div class="checkbox">
-                            <input type="checkbox" onclick ='markMilestone(this, ${milestone._id})'>
+                            <input type="checkbox" ${milestone.done ? 'checked' : ''} onclick ='markMilestone(this, ${milestone._id})'>
                         </div>
                         <div onclick = 'openMilestone(this, ${milestone._id})'>
                             <p>
@@ -32,7 +32,7 @@ function loadMilestones() {
 }
 
 function openMilestone(milestoneElements, id) {
-    const currentPanel = milestoneElements.parentNode.nextElementSibling 
+    const currentPanel = milestoneElements.parentNode.nextElementSibling
     const showPanel = document.querySelector('.show')
     const active = document.querySelector('.active')
 
@@ -60,7 +60,7 @@ function showMileston(id) {
 }
 
 
-// listen for hero image load 
+// listen for hero image load
 
 const milestoneImage = document.querySelector('.milestoneImage')
 milestoneImage.onload = function () {
@@ -68,19 +68,29 @@ milestoneImage.onload = function () {
 }
 
 function markMilestone(checkbox, id) {
-    const doneList = document.querySelector('.doneList')
-    const milestoneList = document.querySelector('.milestones')
-    const item = document.getElementById(id)
 
-    if(checkbox.checked) {
-        // mark as done remove from milestone and adding donList 
-        milestoneList.removeChild(item)
-        doneList.appendChild(item)
-    }else{
-        milestoneList.appendChild(item)
-        doneList.removeChild(item)
-    }
-    
+    // console.log(checkbox, id)
+
+    //  get index of milestone
+    const index = milestonesData.findIndex(function(milestone) {
+         return milestone._id == id
+    })
+    milestonesData[index].done = checkbox.checked;
+
+
+    // get all done milestones
+    const doneMilestones = milestonesData.filter(function(milestone) {
+        return milestone.done
+    })
+
+    // get all undone milestones
+    const undoneMilestones = milestonesData.filter(function(milestone) {
+        return !milestone.done
+    })
+
+    // render done milestones
+    loadMilestones(doneMilestones, '.doneList')
+    loadMilestones(undoneMilestones, '.milestones')
 }
 
-loadMilestones()
+loadMilestones(milestonesData,'.milestones')
